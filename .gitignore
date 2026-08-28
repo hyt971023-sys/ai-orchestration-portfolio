@@ -1,0 +1,27 @@
+# ── 데이터 파일 전면 차단 (실무 데이터 유입 방지)
+*.csv
+*.xlsx
+*.xls
+*.json.gz
+data/
+raw/
+exports/
+!demo/fixtures/*.json
+
+# ── 자격증명
+.env
+.env.*
+*.pem
+*.key
+credentials*
+secrets*
+
+# ── 런타임
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.DS_Store
+node_modules/
+demo/_snapshots/

@@ -1,0 +1,132 @@
+name: ci
+on: [push, pull_request]
+
+jobs:
+  guards:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # 게이트가 커밋 히스토리 객체까지 스캔한다.
+          # 얕은 클론이면 볼 수 있는 히스토리가 1커밋뿐이고, 게이트는 그 상태를
+          # 통과로 처리하지 않고 실패시킨다 (검사하지 못한 것을 통과로 세지 않기 위해).
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # 실제 값을 담은 규칙 파일은 저장소 밖(로컬 사용자 설정 디렉터리)에 있어 CI 에 없다.
+      # 그래서 CI 는 "탐지력이 아직 살아 있는지"를 카나리로 양성 대조한다.
+      #
+      # 🔴 카나리 문자열은 실행할 때 만든다. 워크플로 파일에 리터럴로 적으면
+      #    그 문자열이 저장소 안에 존재해버려서, 카나리를 빼도 게이트가 계속 적중한다.
+      #    (검사 대상 문자열을 검사 설정 파일에 적지 않는다 — 게이트 설계 원칙 1과 같은 이유)
+      - name: 게이트 탐지력 양성 대조 (심으면 실패 · 빼면 통과)
+        run: |
+          set -uo pipefail
+          CANARY="ZZ$RANDOM$RANDOM$$CANARY"
+          RULES="$RUNNER_TEMP/canary-rules"
+          printf '카나리\t%s\n' "$CANARY" > "$RULES"
+
+          printf '%s\n' "$CANARY" > canary-plant.txt
+          out=$(REDACTION_RULES_FILE="$RULES" ./scripts/redaction-gate.sh 2>&1); rc=$?
+          rm -f canary-plant.txt
+          printf '%s\n' "$out"
+          if [ "$rc" -eq 0 ]; then
+            echo "🔴 저장소 안 카나리를 못 잡았다 — 게이트가 무증상 미수행 상태"; exit 1
+          fi
+          if ! printf '%s\n' "$out" | grep -q '작업트리'; then
+            echo "🔴 실패는 했는데 작업 트리 적중으로 보고되지 않았다"; exit 1
+          fi
+
+          if ! REDACTION_RULES_FILE="$RULES" ./scripts/redaction-gate.sh; then
+            echo "🔴 카나리를 뺐는데도 실패한다 — 시험이 아니라 게이트가 고장 난 것"; exit 1
+          fi
+          echo "✅ 심으면 실패 · 빼면 통과"
+
+      - name: 규칙 파일이 없거나 경로가 없으면 실패하는지 검증
+        run: |
+          set -uo pipefail
+          if REDACTION_RULES_FILE="$RUNNER_TEMP/does-not-exist" ./scripts/redaction-gate.sh; then
+            echo "🔴 규칙 파일이 없는데 통과했다 — 게이트가 무증상 미수행 상태"; exit 1
+          fi
+          if ./scripts/redaction-gate.sh; then
+            echo "🔴 규칙 파일 경로를 주지 않았는데 통과했다"; exit 1
+          fi
+          echo "✅ 검사할 목록이 없으면 실패"
+
+      # 파일명으로 판정하는 게이트는 다른 이름으로 복사하는 것만으로 우회된다.
+      # 그래서 이름을 바꿔가며 전부 걸리는지 확인한다 — 지정해도 실패, 그냥 둬도 실패.
+      - name: 저장소 안 규칙 파일은 이름과 무관하게 실패하는지 검증
+        run: |
+          set -uo pipefail
+          CANARY="ZZ$RANDOM$RANDOM$$CANARY"
+          RULES="$RUNNER_TEMP/canary-rules"
+          printf '카나리\t%s\n' "$CANARY" > "$RULES"
+          printf '고유 식별자\t%sOrg\n고유 식별자\t%sBrand\n' "$CANARY" "$CANARY" \
+            > "$RUNNER_TEMP/literal-rules"
+          for n in .redaction-rules.local .redaction-rules.mine notes.tsv docs/keep.md; do
+            cp "$RUNNER_TEMP/literal-rules" "$n"
+            if REDACTION_RULES_FILE="$n" ./scripts/redaction-gate.sh >/dev/null; then
+              echo "🔴 $n 을 규칙 파일로 지정했는데 통과했다"; rm -f "$n"; exit 1
+            fi
+            if REDACTION_RULES_FILE="$RULES" ./scripts/redaction-gate.sh >/dev/null; then
+              echo "🔴 $n 이 저장소 안에 있는데 통과했다"; rm -f "$n"; exit 1
+            fi
+            rm -f "$n"
+          done
+          echo "✅ 파일명과 무관하게 실패"
+
+      # 작업 트리에서 지운 문자열은 커밋 객체에 그대로 남는다.
+      # 일회용 클론에 카나리를 커밋한 뒤 지우고, 작업 트리가 깨끗한 상태로 게이트를 돌린다.
+      - name: 히스토리에만 남은 문자열도 잡는지 검증
+        run: |
+          set -uo pipefail
+          CANARY="ZZ$RANDOM$RANDOM$$CANARY"
+          RULES="$RUNNER_TEMP/hist-rules"
+          printf '카나리\t%s\n' "$CANARY" > "$RULES"
+          git clone -q . "$RUNNER_TEMP/hist-repo" || exit 1
+          cd "$RUNNER_TEMP/hist-repo" || exit 1
+          git config user.email ci@example.invalid
+          git config user.name ci
+          printf '%s\n' "$CANARY" > leaked.txt
+          git add leaked.txt && git commit -qm "카나리 커밋"
+          git rm -q leaked.txt && git commit -qm "카나리 삭제"
+          if [ -e leaked.txt ]; then echo "🔴 시험 설계 오류: 작업 트리에 아직 남아 있다"; exit 1; fi
+          out=$(REDACTION_RULES_FILE="$RULES" ./scripts/redaction-gate.sh 2>&1); rc=$?
+          printf '%s\n' "$out"
+          if [ "$rc" -eq 0 ]; then
+            echo "🔴 작업 트리에서 지웠더니 통과했다 — 히스토리를 안 본다"; exit 1
+          fi
+          if ! printf '%s\n' "$out" | grep -q '히스토리 '; then
+            echo "🔴 실패는 했는데 히스토리 적중으로 보고되지 않았다"; exit 1
+          fi
+          echo "✅ 히스토리 객체까지 스캔한다"
+
+      - name: 얕은 클론이면 통과로 처리하지 않는지 검증
+        run: |
+          set -uo pipefail
+          CANARY="ZZ$RANDOM$RANDOM$$CANARY"
+          RULES="$RUNNER_TEMP/shallow-rules"
+          printf '카나리\t%s\n' "$CANARY" > "$RULES"
+          git clone -q --depth 1 "file://$PWD" "$RUNNER_TEMP/shallow-repo" || exit 1
+          cd "$RUNNER_TEMP/shallow-repo" || exit 1
+          if REDACTION_RULES_FILE="$RULES" ./scripts/redaction-gate.sh; then
+            echo "🔴 얕은 클론인데 통과했다 — 히스토리를 못 봤는데 초록불"; exit 1
+          fi
+          echo "✅ 히스토리를 볼 수 없으면 통과로 처리하지 않는다"
+
+      - name: 안전장치 테스트
+        run: |
+          pip install pytest
+          python -m pytest demo/tests -q
+          PYTHONPATH=tools python -m pytest tools/maturity/tests -q
+      - name: 데모 실행 확인
+        run: python -m demo "형광펜 A 옐로 막아줘"
+
+      - name: 측정 도구 실행 확인
+        run: |
+          export PYTHONPATH=tools
+          python -m maturity sample > /tmp/tasks.csv
+          python -m maturity report /tmp/tasks.csv
+          python -m maturity report /tmp/tasks.csv -f json > /dev/null

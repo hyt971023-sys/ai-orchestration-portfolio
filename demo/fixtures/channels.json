@@ -1,0 +1,169 @@
+{
+  "mall": [
+    {
+      "channel_code": "M-1001",
+      "name": "형광펜 A 01 옐로",
+      "sellable": true,
+      "displayed": true,
+      "qty": 40
+    },
+    {
+      "channel_code": "M-1002",
+      "name": "형광펜 A 02 그린",
+      "sellable": true,
+      "displayed": true,
+      "qty": 40
+    },
+    {
+      "channel_code": "M-1003",
+      "name": "형광펜 A 03 라벤더",
+      "sellable": true,
+      "displayed": true,
+      "qty": 40
+    },
+    {
+      "channel_code": "M-1004",
+      "name": "형광펜 A 01 옐로 (구형)",
+      "sellable": true,
+      "displayed": true,
+      "qty": 12
+    },
+    {
+      "channel_code": "M-2001",
+      "name": "마스킹테이프 B 01 아이보리",
+      "sellable": true,
+      "displayed": true,
+      "qty": 40
+    },
+    {
+      "channel_code": "M-2002",
+      "name": "마스킹테이프 B 02 민트",
+      "sellable": true,
+      "displayed": true,
+      "qty": 40
+    },
+    {
+      "channel_code": "M-2003",
+      "name": "마스킹테이프 B 03 그레이",
+      "sellable": true,
+      "displayed": true,
+      "qty": 40
+    },
+    {
+      "channel_code": "M-3001",
+      "name": "스프링노트 C 01 네이비",
+      "sellable": true,
+      "displayed": true,
+      "qty": 40
+    },
+    {
+      "channel_code": "M-3002",
+      "name": "스프링노트 C 02 카키",
+      "sellable": true,
+      "displayed": true,
+      "qty": 40
+    },
+    {
+      "channel_code": "M-9001",
+      "name": "형광펜 A 1+1 세트 01 옐로",
+      "sellable": true,
+      "displayed": true,
+      "qty": 40
+    },
+    {
+      "channel_code": "M-9002",
+      "name": "마스킹테이프 B 3종 세트 베스트",
+      "sellable": true,
+      "displayed": true,
+      "qty": 40
+    },
+    {
+      "channel_code": "M-2004",
+      "name": "마스킹테이프 B 04 레드 (단종)",
+      "sellable": false,
+      "displayed": true,
+      "qty": 0
+    }
+  ],
+  "marketplace": [
+    {
+      "channel_code": "MP-77101",
+      "name": "형광펜 A 01 옐로",
+      "sellable": true,
+      "displayed": true,
+      "qty": 40
+    },
+    {
+      "channel_code": "MP-77102",
+      "name": "형광펜 A 02 그린",
+      "sellable": true,
+      "displayed": true,
+      "qty": 40
+    },
+    {
+      "channel_code": "MP-77103",
+      "name": "형광펜A 01옐로 구형",
+      "sellable": true,
+      "displayed": true,
+      "qty": 6
+    },
+    {
+      "channel_code": "MP-77201",
+      "name": "마스킹테이프 B 01 아이보리",
+      "sellable": true,
+      "displayed": true,
+      "qty": 40
+    },
+    {
+      "channel_code": "MP-77202",
+      "name": "마스킹테이프 B 02 민트",
+      "sellable": true,
+      "displayed": true,
+      "qty": 40
+    },
+    {
+      "channel_code": "MP-77301",
+      "name": "스프링노트 C 01 네이비",
+      "sellable": true,
+      "displayed": true,
+      "qty": 40
+    },
+    {
+      "channel_code": "MP-77901",
+      "name": "형광펜 A 1+1 세트 01 옐로",
+      "sellable": true,
+      "displayed": true,
+      "qty": 40
+    },
+    {
+      "channel_code": "MP-77999",
+      "name": "(크로스워크 미등록 상품)",
+      "sellable": true,
+      "displayed": true,
+      "qty": 0
+    }
+  ],
+  "partner": [
+    {
+      "channel_code": "PT-A1",
+      "name": "형광펜A_01옐로(수출표기)",
+      "sellable": true,
+      "displayed": true,
+      "qty": 40
+    },
+    {
+      "channel_code": "PT-A2",
+      "name": "마스킹테이프 B 01 아이보리",
+      "sellable": true,
+      "displayed": true,
+      "qty": 40
+    },
+    {
+      "channel_code": "PT-A3",
+      "name": "스프링노트 C 01 네이비",
+      "sellable": true,
+      "displayed": true,
+      "qty": 40
+    }
+  ]
+}
