@@ -86,8 +86,8 @@ python -m maturity report tasks.csv       # 분포 · 두 지표 · 숨은 위�
 실무 시스템은 공개할 수 없으므로, **핵심 설계를 더미 데이터로 처음부터 다시 구현**했습니다.
 
 ```bash
-git clone https://github.com/hyt971023-sys/portfolio-ai-orchestration
-cd portfolio-ai-orchestration
+git clone https://github.com/hyt971023-sys/ai-orchestration-portfolio
+cd ai-orchestration-portfolio
 python -m demo "형광펜 A 옐로 재고 부족하니까 전 채널에서 막아줘"
 ```
 
