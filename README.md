@@ -17,9 +17,21 @@
 | **어떻게** | 코딩 에이전트(Claude Code) + 커머스 SaaS·마켓플레이스 API + 스케줄러. 설계·검증·운영은 직접 소유 |
 | **차별점** | 자동화보다 **안전장치**를 먼저 설계 — 읽기전용 기본 · 롤백 스냅샷 · dry-run 관찰 · 킬스위치 |
 | **자체 고안** | [업무 성숙도 4단계 프레임워크](docs/maturity-framework.md) 와 **실행 위치 집중도** 지표 |
-| **직접 확인** | [재현 데모](demo/) · [측정 도구](tools/maturity/) — 둘 다 바로 실행됩니다 |
+| **돌아가는 코드** | **[multichannel-inventory-allocator](https://github.com/hyt971023-sys/multichannel-inventory-allocator)** — 의존성 0 · 테스트 33건 · CI · clone 후 즉시 실행 |
+| **직접 확인** | [측정 도구](tools/maturity/) · [재현 데모](demo/) — 이 저장소 안에서 바로 실행됩니다 |
 | **구조** | [아키텍처 다이어그램 4종](docs/diagrams/) — 시스템 구성 · 안전장치 배치 · 두 축 · 감시 구조 |
 | **실패 기록** | [케이스 06](cases/06-gate-failure.md) — 제가 만든 안전장치가 실패한 과정과, 그래서 기준을 바꾼 이야기 |
+
+<br>
+
+## 저장소 두 개의 역할
+
+| | |
+|---|---|
+| **이 저장소** (ai-orchestration-portfolio) | **무엇을 왜 자동화했고, 틀렸을 때 어떻게 대비했나** — 판단 기준·안전 설계·측정 방법론·실패 케이스 6건. 여기 `demo/` 는 케이스 01 을 축약 재현한 것입니다. |
+| **[multichannel-inventory-allocator](https://github.com/hyt971023-sys/multichannel-inventory-allocator)** | **그래서 짜면 이렇게 나온다** — 같은 문제를 합성 데이터로 처음부터 구현한 클린룸 데모. 표준 라이브러리만 · 테스트 33건 · CI 매트릭스. |
+
+코드부터 보고 싶으시면 아래(allocator)를, 판단 과정부터 보고 싶으시면 이 저장소를 먼저 보시면 됩니다.
 
 <br>
 
